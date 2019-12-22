@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: callummarriage
-  Date: 21/12/2019
-  Time: 13:48
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -12,13 +5,11 @@
 <head>
     <title>My selection</title>
 
-    <!--
+    <link rel="stylesheet" type="text/css"
+          href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+
 	<spring:url value="/css/main.css" var="springCss" />
 	<link href="${springCss}" rel="stylesheet" />
-	 -->
-
-    <c:url value="/css/main.css" var="jstlCss"/>
-    <link href="${jstlCss}" rel="stylesheet"/>
 
     <script src="https://code.jquery.com/jquery-1.10.2.js"
             type="text/javascript"></script>
@@ -29,39 +20,42 @@
 
 <script type="text/javascript">
 
-    function FinaliseBooking() {
-        $('#msg').hide();
 
-        $.ajax({
-            type: "GET",
-            url: "http://localhost:8080/getClientID",
-            data: {
-                username: "${username}"
-            },
-            success: function (data) {
-                let clientID = data.split("<clientID>")[1];
-                $.ajax({
+    $(document).ready(function () {
 
-                    type: "POST",
-                    url: 'http://localhost:8080/finaliseBooking',
-                    data: {
-                        clientId: clientID,
-                    },
-                    success: function (responseText) {
-                        window.location.href = "viewTimetable";
-                        console.log('success')
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.log("error");
-                    }
-                });
-            }
-        })
-    }
+        $('#finaliseBooking').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/getClientID",
+                data: {
+                    username: "${username}"
+                },
+                success: function (data) {
+                    let clientID = data.split("<clientID>")[1];
+                    console.log("here" + clientID)
+                    $.ajax({
+                        type: "POST",
+                        url: 'http://localhost:8080/finaliseBooking',
+                        data: {
+                            clientId: clientID,
+                        },
+                        success: function (responseText) {
+                            window.location.href = "viewTimetable";
+                            console.log('success')
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log("error");
+                        }
+                    });
+                }
+            })
+        });
+    });
 
 </script>
 
-<jsp:include page="navBar.jspx"/>
+<jsp:include page="navbar.jspx"/>
 
 <table>
 
@@ -86,7 +80,9 @@
     </c:forEach>
 </table>
 
-<button onclick='FinaliseBooking()'>Finalise Booking</button>
+
+<jsp:include page="footer.jspx"/>
+
 
 <!-- /.container -->
 

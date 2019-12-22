@@ -4,15 +4,11 @@
 <html lang="en">
 <head>
 
-<link rel="stylesheet" type="text/css"
-	href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css"
+		href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
 
-<!-- 
 	<spring:url value="/css/main.css" var="springCss" />
 	<link href="${springCss}" rel="stylesheet" />
-	 -->
-<c:url value="/css/main.css" var="jstlCss" />
-<link href="${jstlCss}" rel="stylesheet" />
 
 	<title>Lessons</title>
 	<script src="https://code.jquery.com/jquery-1.10.2.js"
@@ -61,7 +57,7 @@
 	<p id="error"></p>
 
 
-	<jsp:include page="navBar.jspx"/>
+	<jsp:include page="navbar.jspx"/>
 
 	<table>
 		<h1>Here are all of the lessons we have available.</h1>

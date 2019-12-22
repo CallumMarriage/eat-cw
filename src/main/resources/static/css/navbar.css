@@ -1,0 +1,15 @@
+.navbar {
+    border: 1px solid black;
+    width: fit-content;
+    height: fit-content;
+}
+
+.navbar-link {
+    width: fit-content;
+    font-size: 3em;
+    border-right-color: black;
+    border-right-style: solid;
+    border-right-width: 1px;
+    margin-right: 5px;
+    padding: 5px;
+}
