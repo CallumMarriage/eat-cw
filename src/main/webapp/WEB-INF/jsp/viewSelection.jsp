@@ -32,8 +32,9 @@
                     username: "${username}"
                 },
                 success: function (data) {
-                    let clientID = data.split("<clientID>")[1];
-                    console.log("here" + clientID)
+                    let clientID = data.responseXML
+                        .getElementsByTagName("clientID")[0].textContent;
+
                     $.ajax({
                         type: "POST",
                         url: 'http://localhost:8080/finaliseBooking',

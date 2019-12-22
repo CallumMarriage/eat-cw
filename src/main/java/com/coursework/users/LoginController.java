@@ -38,8 +38,6 @@ public class LoginController {
 
         String username = request.getParameter("username");
 
-        log.info(username);
-
         if (!loginService.checkIfInUse(username)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             writeMessageToResponse(response, "<error>\n" +
@@ -73,10 +71,15 @@ public class LoginController {
         Integer clientID = loginService.getClientIdByUsername(username);
         if (clientID == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            writeMessageToResponse(response, "<error>\n" +
+                    "<code>4" +
+                    "</code>\n" +
+                    "<message>No clientID for that username</message>\n" +
+                    "</error>");
+
             return "viewTimetable";
         }
-        writeMessageToResponse(response, clientID.toString());
-
+        writeMessageToResponse(response, "<clientID>" +clientID.toString()+"</clientID>");
         return "viewTimetable";
     }
 
@@ -109,7 +112,7 @@ public class LoginController {
     }
 
     private void writeMessageToResponse(HttpServletResponse response, String message) {
-        response.setContentType("application/xml, charset=\"UTF-8\"");
+        response.setContentType("application/xml");
         try {
             PrintWriter writer = response.getWriter();
             writer.println("<?xml version='1.0' encoding='UTF-8'?> \n" + message);

@@ -34,10 +34,6 @@ public class LoginService {
 
     public Boolean checkIfInUse(String username){
         Optional<Client> client = loginRepository.findByUsername(username);
-
-        client.ifPresent(client1 -> {
-            log.info(client.get().getUsername());
-        });
         return client.isPresent();
     }
 
