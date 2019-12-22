@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 
 /**
@@ -26,37 +27,58 @@ public class LoginController {
         this.loginService = loginService;
     }
 
+    @GetMapping("/registration")
+    public String getRegistration(){
+        return "registration";
+    }
+
     @PostMapping("/login")
     public String postLogin(
-            HttpServletRequest request) {
+            HttpServletRequest request, HttpServletResponse response) {
 
+        String username = request.getParameter("username");
 
-        String username = loginService.validate(request.getParameter("username"), request.getParameter("password"));
-        if (username != null) {
+        if (!loginService.checkIfInUse(username)) {
+            log.info("he1y");
+
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            writeMessageToResponse(response, "<error>\n" +
+                    "<code>1" +
+                    "</code>\n" +
+                    "<message>The username does not exist</message>\n" +
+                    "</error>");
+            return "index";
+        }
+
+        if (loginService.validate(username, request.getParameter("password"))) {
+            log.info("he2y");
             request.getSession().setAttribute("isLoggedIn", "true");
             request.getSession().setAttribute("username", username);
             return "redirect:/viewTimetable";
         } else {
-            request.getSession().setAttribute("loginError", "Error logging in.");
-            return "redirect:/";
+            log.info("hey3");
+
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            writeMessageToResponse(response, "<error>\n" +
+                    "<code>2" +
+                    "</code>\n" +
+                    "<message>The password was incorrect</message>\n" +
+                    "</error>");
+            return "index";
         }
     }
 
     @GetMapping("/getClientID")
-    public String getClientId(ModelMap model, HttpServletRequest request, HttpServletResponse response){
+    public String getClientId(ModelMap model, HttpServletRequest request, HttpServletResponse response) {
         String username = request.getParameter("username");
 
         Integer clientID = loginService.getClientIdByUsername(username);
-        if(clientID == null){
+        if (clientID == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return "viewTimetable";
         }
-        try {
-            response.getWriter().write("<clientID>" + clientID + "<clientID>");
-            response.getWriter().flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writeMessageToResponse(response, clientID.toString());
+
         return "viewTimetable";
     }
 
@@ -74,9 +96,7 @@ public class LoginController {
 
         if (loginService.checkIfInUse(username)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("The username you have entered is already in use");
-            response.setContentType("plain/text");
-            response.getWriter().flush();
+            writeMessageToResponse(response, "<errorMessage>The username is already in use</errorMessage><errorType>3</errorType>");
             return "index";
         }
 
@@ -88,6 +108,16 @@ public class LoginController {
 
         loginService.addNewUser(client);
         return "redirect:/viewSelection";
+    }
 
+    private void writeMessageToResponse(HttpServletResponse response, String message) {
+        response.setContentType("application/xml, charset=\"UTF-8\"");
+        try {
+            PrintWriter writer = response.getWriter();
+            writer.println("<?xml version='1.0' encoding='UTF-8'?> \n" + message);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

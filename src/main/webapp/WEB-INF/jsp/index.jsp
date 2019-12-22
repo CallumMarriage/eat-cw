@@ -5,83 +5,77 @@
 <html>
     <head>
         <title>Login / signup page</title>
+
         <script src="https://code.jquery.com/jquery-1.10.2.js"
                 type="text/javascript"></script>
 
         <link rel="stylesheet" type="text/css"
               href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
-
     </head>
     <body>
         <h2>Please log in!</h2>
-        <form method="POST" action="http://localhost:8080/login">
+        <form id="login">
             Username:<input id="username" type="text" name="username" value=""/>----
             Password:<input type="password" name="password"  value="" />
-            <input id="login" type="submit" value="Login" />
+            <input id="loginSubmit" type="submit" value="Login" />
         </form>
 
 
-        <div id="loginError"></div>
+        <div id="loginError">
+        </div>
+        <div id="registerLink"></div>
 
-
-        <form id="register">
-            <h2> Don't yet have an account? </h2>
-            Username:<input type="text" id="newUsername" name="newUsername" onkeypress="checkLength()" value="" />----
-            Password:<input type="password" name="newPassword"  onkeypress="checkLength()"  value="" />
-            <input id="registerSubmit" type="submit" value="Register" disabled="disabled"/>
-        </form>
-
-        <div id="registrationError"></div>
-
-
-        <p id="error"></p>
 
         <script type="text/javascript">
 
             $(document).ready(function() {
-                let registrationError = $('#registrationError');
-                registrationError.hide();
 
-                $('#register').submit(function (e) {
+                $('#login').submit(function (e) {
+                    let loginError = $('#loginError');
+                    loginError.hide();
+
                     e.preventDefault();
-                    $.ajax('http://localhost:8080/register',{
+                    $.ajax('http://localhost:8080/login',{
                         type: "POST",
                         data : {
-                            newUsername : document.getElementsByName('newUsername')[0].value,
-                            newPassword : document.getElementsByName('newPassword')[0].value
+                            newUsername : document.getElementsByName('username')[0].value,
+                            newPassword : document.getElementsByName('password')[0].value
                         },
+
                         success: function (responseText) {
 
-                            $('#newUsername').val('');
-                            $('#newPassword').val('');
+                            clearLoginDetails();
+                            window.location.href = "viewTimetable";
 
-                            registrationError.html('<p>You have successfully registered!</p>');
-                            registrationError.css("color", "green");
-                            registrationError.show();
                         },
                         error: function (jqXHR, textStatus, errorMessage) {
-                            registrationError.html('<p>The username you have entered is already in use</p>');
-                            registrationError.css("color", "red");
-                            registrationError.show();
+                            clearLoginDetails();
+                            let errorCode = jqXHR.responseXML
+                                .getElementsByTagName("error")[0]
+                                .getElementsByTagName("code").item(0).textContent;
+
+                            let errorMes = jqXHR.responseXML
+                                .getElementsByTagName("error")[0]
+                                .getElementsByTagName("message").item(0).textContent;
+
+                            loginError.html('<p>'+errorMes+'</p>')
+
+                            if(errorCode === "1"){
+                                $('#registerLink').html('<a href="http://localhost:8080/registration">Click here to register</a>')
+                            }
+                            loginError.css("color", "red");
+                            loginError.show();
 
                         }})
                 })
+
             });
 
-
-            function checkLength(){
-                let username = document.getElementsByName('newUsername')[0].value;
-                let password = document.getElementsByName('newPassword')[0].value;
-
-                if((username.length > 0 && username.length <= 7) && (password.length >0)){
-                    $('#registerSubmit').removeAttr('disabled')
-                    return true;
-                } else {
-                    $('#registerSubmit').attr('disabled', 'disabled')
-
-                    return false;
-                }
+            function clearLoginDetails(){
+                $('#username').val('');
+                $('#password').val('');
             }
+
         </script>
 
     </body>

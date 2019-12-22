@@ -4,13 +4,14 @@
 <html lang="en">
 <head>
 
+	<title>Lessons</title>
+
 	<link rel="stylesheet" type="text/css"
 		href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
 
 	<spring:url value="/css/main.css" var="springCss" />
 	<link href="${springCss}" rel="stylesheet" />
 
-	<title>Lessons</title>
 	<script src="https://code.jquery.com/jquery-1.10.2.js"
 			type="text/javascript"></script>
 </head>

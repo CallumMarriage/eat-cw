@@ -21,15 +21,12 @@ public class LoginService {
     }
 
 
-    public String validate(String username, String password){
+    public Boolean validate(String username, String password){
 
         Optional<Client> client = loginRepository.findByUsername(username);
 
-        if(client.isPresent() && client.get().getPassword().equals(password)){
-            return client.get().getUsername();
-        }else {
-            return null;
-        }
+        return client.isPresent() && client.get().getPassword().equals(password);
+
     }
 
 
