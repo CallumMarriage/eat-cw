@@ -84,17 +84,18 @@
     </tr>
 
 
-
     <c:forEach items="${lessons}" var="lesson">
 
-        <form class="chooseLesson" id="lesson-${lesson.getLessonId()}">
-            <p id="desc-${lesson.getLessonId()}">"${lesson.getDescription()}"</p>
-            <p id="level-${lesson.getLevel()}">"${lesson.getLevel()}"</p>
-            <p id="lessonDate-${lesson.getLessonDate()}">"${lesson.getLessonDate()}"</p>
-            <p id="startTime-${lesson.getStartTime()}">"${lesson.getStartTime()}"</p>
-            <p id="endTime-${lesson.getEndTime()}">"${lesson.getEndTime()}"</p>
-            <p class="lessonid" id="lessonId-${lesson.getLessonId()}" name="lessonId">"${lesson.getLessonId()}"</p>
-            <input type="submit" value="Select Lesson" onclick="addHiddenFields('${lesson.getLessonId()}')">
+        <form class="chooseLesson">
+
+            <tr>
+                <td><c:out value="${lesson.getDescription()}" /></td>
+                <td><c:out value="${lesson.getLevel()}" /></td>
+                <td><c:out value="${lesson.getLessonDate()}"/></td>
+                <td><c:out value="${lesson.getStartTime()}" /></td>
+                <td><c:out value="${lesson.getEndTime()}" /></td>
+                <td><input type="submit" value="Select Lesson" onclick="addHiddenFields('${lesson.getLessonId()}')"></td>
+            </tr>
         </form>
     </c:forEach>
 

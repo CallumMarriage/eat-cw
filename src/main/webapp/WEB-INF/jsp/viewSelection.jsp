@@ -32,7 +32,7 @@
                     username: "${username}"
                 },
                 success: function (data) {
-                    let clientID = data.responseXML
+                    let clientID = data
                         .getElementsByTagName("clientID")[0].textContent;
 
                     $.ajax({
