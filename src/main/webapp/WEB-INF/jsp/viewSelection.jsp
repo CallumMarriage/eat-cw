@@ -12,10 +12,14 @@
 <head>
     <title>My selection</title>
 
-
-    <link href="${jstlCss}" rel="stylesheet"/>
+    <!--
+	<spring:url value="/css/main.css" var="springCss" />
+	<link href="${springCss}" rel="stylesheet" />
+	 -->
 
     <c:url value="/css/main.css" var="jstlCss"/>
+    <link href="${jstlCss}" rel="stylesheet"/>
+
     <script src="https://code.jquery.com/jquery-1.10.2.js"
             type="text/javascript"></script>
 </head>
@@ -57,12 +61,7 @@
 
 </script>
 
-<div id="mySidenav" class="sidenav">
-    <a href="${pageContext.request.contextPath}/viewSelection">View Selection</a>
-    <a href="${pageContext.request.contextPath}/viewTimetable">View Timetable</a>
-    <a href="${pageContext.request.contextPath}/logout">Logout</a>
-
-</div>
+<jsp:include page="navBar.jspx"/>
 
 <table>
 

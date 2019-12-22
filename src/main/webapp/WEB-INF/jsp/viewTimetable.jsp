@@ -61,12 +61,7 @@
 	<p id="error"></p>
 
 
-	<div id="mySidenav" class="sidenav">
-		<a href="${pageContext.request.contextPath}/viewSelection">View Selection</a>
-		<a href="${pageContext.request.contextPath}/viewTimetable">View Timetable</a>
-		<a href="${pageContext.request.contextPath}/logout">Logout</a>
-
-	</div>
+	<jsp:include page="navBar.jspx"/>
 
 	<table>
 		<h1>Here are all of the lessons we have available.</h1>

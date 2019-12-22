@@ -54,6 +54,10 @@
                     newPassword : document.getElementsByName('newPassword')[0].value
                 },
                 success: function (responseText) {
+
+                    $('#newUsername').val('');
+                    $('#newPassword').val('');
+
                     $('#registrationError').html('<p>You have successfully registered!</p>');
                     $('#registrationError').css("color", "green");
                     $('#registrationError').show();
