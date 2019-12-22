@@ -60,9 +60,7 @@
     });
 
     function addHiddenFields(id){
-        console.log(id)
         $("#lessonId").val(id);
-        console.log($('#lessonId').val())
     }
 </script>
 
