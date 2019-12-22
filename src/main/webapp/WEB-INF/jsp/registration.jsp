@@ -40,7 +40,7 @@
                 success: function (responseText) {
 
                     clearRegDetails();
-                    window.location.href = "index";
+                    window.location.href = "/";
                 },
                 error: function (jqXHR, textStatus, errorMessage) {
                     clearRegDetails();

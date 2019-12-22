@@ -38,8 +38,8 @@
                     $.ajax('http://localhost:8080/login',{
                         type: "POST",
                         data : {
-                            newUsername : document.getElementsByName('username')[0].value,
-                            newPassword : document.getElementsByName('password')[0].value
+                            username : document.getElementsByName('username')[0].value,
+                            password : document.getElementsByName('password')[0].value
                         },
 
                         success: function (responseText) {

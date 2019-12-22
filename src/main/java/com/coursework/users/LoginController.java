@@ -38,9 +38,9 @@ public class LoginController {
 
         String username = request.getParameter("username");
 
-        if (!loginService.checkIfInUse(username)) {
-            log.info("he1y");
+        log.info(username);
 
+        if (!loginService.checkIfInUse(username)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             writeMessageToResponse(response, "<error>\n" +
                     "<code>1" +
@@ -51,12 +51,10 @@ public class LoginController {
         }
 
         if (loginService.validate(username, request.getParameter("password"))) {
-            log.info("he2y");
             request.getSession().setAttribute("isLoggedIn", "true");
             request.getSession().setAttribute("username", username);
             return "redirect:/viewTimetable";
         } else {
-            log.info("hey3");
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             writeMessageToResponse(response, "<error>\n" +
