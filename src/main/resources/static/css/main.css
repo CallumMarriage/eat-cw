@@ -1,0 +1,12 @@
+h1{
+	color:#0000FF;
+}
+
+h2{
+	color:#FF0000;
+}
+
+table, th, td {
+	border: 1px solid black;
+	margin-bottom: 1px;
+}
