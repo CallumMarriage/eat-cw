@@ -6,14 +6,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
@@ -60,7 +65,7 @@ public class LessonController {
 
 
     @PostMapping("/chooseLesson")
-    public String chooseLesson(HttpServletRequest request) throws LessonBookedException{
+    public String chooseLesson(HttpServletRequest request, HttpServletResponse response) throws LessonBookedException{
         if (checkIfLoggedIn(request)) {
 
             String lessonId = request.getParameter("lessonId");
@@ -72,7 +77,10 @@ public class LessonController {
             List<String> lessonChoices = (List<String>) request.getSession().getAttribute("lessonChoices");
 
             if(lessonChoices.contains(lessonId)){
-                throw new LessonBookedException("You have already booked this lesson");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                writeMessageToResponse(response, "<error>\n" +
+                        "<message>You have already booked this lesson</message>\n" +
+                        "</error>");
             }
 
             lessonChoices.add(lessonId);
@@ -116,8 +124,37 @@ public class LessonController {
 
     }
 
+    @PostMapping("/removeLessonChoice/{lessonId}")
+    public String removeLessonChoice(@PathVariable("lessonId") String lessonId, HttpServletRequest request, HttpServletResponse response){
+        if(checkIfLoggedIn(request)){
+
+            if(request.getSession().getAttribute("lessonChoices") == null){
+                return "redirect:viewTimetable";
+            }
+
+            List<String> choices = (ArrayList<String>) request.getSession().getAttribute("lessonChoices");
+
+            List<String> filtered = choices.stream().filter(choice -> !choice.equals(lessonId)).collect(Collectors.toList());
+
+            request.getSession().setAttribute("lessonChoices", filtered);
+            return "redirect:/viewTimetable";
+        } else {
+            return "redirect:/";
+        }
+    }
+
     private Boolean checkIfLoggedIn(HttpServletRequest request) {
         return "true".equals(request.getSession().getAttribute("isLoggedIn"));
     }
 
+    private void writeMessageToResponse(HttpServletResponse response, String message) {
+        response.setContentType("application/xml");
+        try {
+            PrintWriter writer = response.getWriter();
+            writer.println("<?xml version='1.0' encoding='UTF-8'?> \n" + message);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

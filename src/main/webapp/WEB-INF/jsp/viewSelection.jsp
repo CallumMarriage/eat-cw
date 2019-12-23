@@ -52,7 +52,20 @@
                 }
             })
         });
+
+
     });
+
+    function removeLesson(id){
+        console.log(id);
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:8080/removeLessonChoice/"+ id,
+            success: function (data) {
+                window.location.href = "viewTimetable";
+            }
+        })
+    }
 
 </script>
 
@@ -77,6 +90,7 @@
             <td><c:out value="${myLesson.getLessonDate()}"/></td>
             <td><c:out value="${myLesson.getStartTime()}"/></td>
             <td><c:out value="${myLesson.getEndTime()}"/></td>
+            <td><button onclick="removeLesson('${myLesson.getLessonId()}')">Cancel</button></td>
         </tr>
     </c:forEach>
 </table>

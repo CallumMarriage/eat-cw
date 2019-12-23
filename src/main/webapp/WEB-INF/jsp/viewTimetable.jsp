@@ -21,6 +21,20 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
+        let lc = "${lessonChoices}";
+
+        let c = lc.substr(1, lc.length-1);
+        let t = c.split(",");
+
+        if (t.length >= 3) {
+            console.log("here");
+            $('.choose').attr("disabled", "disabled");
+        } else {
+            $('.choose').removeAttr("disabled");
+        }
+
+
+
         $('.chooseLesson').submit(function (e) {
 
             console.log($("#lessonId").val())
@@ -49,8 +63,13 @@
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
 
+                            let errorMessage = jqXHR.responseXML
+                                .getElementsByTagName("error")[0]
+                                .getElementsByTagName("message").item(0).textContent;
+
+
                             $('#msg').show();
-                            $('#msg').html('<p> Sorry, you have already signed up to that lesson</p>');
+                            $('#msg').html('<p>' + errorMessage + '</p>');
                             $('#msg').css("color", "red");
                         }
                     })
@@ -59,7 +78,7 @@
         })
     });
 
-    function addHiddenFields(id){
+    function addHiddenFields(id) {
         $("#lessonId").val(id);
     }
 </script>
@@ -87,12 +106,13 @@
         <form class="chooseLesson">
 
             <tr>
-                <td><c:out value="${lesson.getDescription()}" /></td>
-                <td><c:out value="${lesson.getLevel()}" /></td>
+                <td><c:out value="${lesson.getDescription()}"/></td>
+                <td><c:out value="${lesson.getLevel()}"/></td>
                 <td><c:out value="${lesson.getLessonDate()}"/></td>
-                <td><c:out value="${lesson.getStartTime()}" /></td>
-                <td><c:out value="${lesson.getEndTime()}" /></td>
-                <td><input type="submit" value="Select Lesson" onclick="addHiddenFields('${lesson.getLessonId()}')"></td>
+                <td><c:out value="${lesson.getStartTime()}"/></td>
+                <td><c:out value="${lesson.getEndTime()}"/></td>
+                <td><input class="choose" type="submit" value="Select Lesson"
+                           onclick="addHiddenFields('${lesson.getLessonId()}')"></td>
             </tr>
         </form>
     </c:forEach>
