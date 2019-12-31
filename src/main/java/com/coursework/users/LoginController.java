@@ -1,5 +1,7 @@
 package com.coursework.users;
 
+import com.coursework.common.ResponseBuilder;
+import com.coursework.common.SessionHandler;
 import com.coursework.users.model.Client;
 import com.coursework.users.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 
 /**
@@ -23,43 +24,39 @@ public class LoginController {
 
     private final LoginService loginService;
 
-    public LoginController(LoginService loginService) {
+    private final ResponseBuilder responseBuilder;
+
+    private final SessionHandler sessionHandler;
+
+    public LoginController(LoginService loginService, ResponseBuilder responseBuilder, SessionHandler sessionHandler) {
         this.loginService = loginService;
+        this.responseBuilder = responseBuilder;
+        this.sessionHandler = sessionHandler;
     }
 
     @GetMapping("/registration")
-    public String getRegistration(){
+    public String getRegistration() {
         return "registration";
     }
 
     @PostMapping("/login")
-    public String postLogin(
-            HttpServletRequest request, HttpServletResponse response) {
+    public String postLogin(HttpServletRequest request, HttpServletResponse response) {
 
         String username = request.getParameter("username");
 
         if (!loginService.checkIfInUse(username)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            writeMessageToResponse(response, "<error>\n" +
-                    "<code>1" +
-                    "</code>\n" +
-                    "<message>The username does not exist</message>\n" +
-                    "</error>");
+            responseBuilder.writeErrorMessageToResponse(response, "The username does not exist", 1);
             return "index";
         }
 
         if (loginService.validate(username, request.getParameter("password"))) {
-            request.getSession().setAttribute("isLoggedIn", "true");
-            request.getSession().setAttribute("username", username);
+            sessionHandler.setUserAsLoggedinInSession(request, username);
             return "redirect:/viewTimetable";
         } else {
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            writeMessageToResponse(response, "<error>\n" +
-                    "<code>2" +
-                    "</code>\n" +
-                    "<message>The password was incorrect</message>\n" +
-                    "</error>");
+            responseBuilder.writeErrorMessageToResponse(response, "The password was incorrect", 2);
             return "index";
         }
     }
@@ -71,15 +68,10 @@ public class LoginController {
         Integer clientID = loginService.getClientIdByUsername(username);
         if (clientID == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            writeMessageToResponse(response, "<error>\n" +
-                    "<code>4" +
-                    "</code>\n" +
-                    "<message>No clientID for that username</message>\n" +
-                    "</error>");
-
+            responseBuilder.writeErrorMessageToResponse(response, "No clientID for that username", 4);
             return "viewTimetable";
         }
-        writeMessageToResponse(response, "<clientID>" +clientID.toString()+"</clientID>");
+        responseBuilder.writeMessageToResponse(response, "<clientID>" + clientID.toString() + "</clientID>");
         return "viewTimetable";
     }
 
@@ -97,7 +89,7 @@ public class LoginController {
 
         if (loginService.checkIfInUse(username)) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            writeMessageToResponse(response, "<errorMessage>The username is already in use</errorMessage><errorType>3</errorType>");
+            responseBuilder.writeErrorMessageToResponse(response, "The username is already in use", 3);
             return "index";
         }
 
@@ -109,16 +101,5 @@ public class LoginController {
 
         loginService.addNewUser(client);
         return "redirect:/viewSelection";
-    }
-
-    private void writeMessageToResponse(HttpServletResponse response, String message) {
-        response.setContentType("application/xml");
-        try {
-            PrintWriter writer = response.getWriter();
-            writer.println("<?xml version='1.0' encoding='UTF-8'?> \n" + message);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

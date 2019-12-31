@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -34,24 +35,19 @@ public class LessonService {
     }
 
 
-    public List<LessonPresentation> getAllLessonsByMultipleIds(Collection<String> lessonIds){
-        Iterable<Lesson> lessonIterable = lessonRepository.findAllById(lessonIds);
-
-        List<Lesson> lessons = new ArrayList<>();
-        lessonIterable.forEach(lessons::add);
-
-        return lessons.stream()
+    public List<LessonPresentation> getAllLessonsByMultipleIds(List<String> lessonIds) {
+        return StreamSupport.stream(lessonRepository.findAllById(lessonIds).spliterator(), false)
                 .map(LessonMapper::mapLessonToPresentation)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void removeCurrentLessonsForClient(Integer clientID){
+    public void removeCurrentLessonsForClient(Integer clientID) {
         lessonsBookedRepository.deleteAllByClientId(clientID);
     }
 
 
-    public void finaliseBookingForClient(Integer clientID, Collection<String> lessons) throws LessonBookedException{
+    public void finaliseBookingForClient(Integer clientID, List<String> lessons) throws LessonBookedException {
 
         lessons.stream()
                 .map(id -> new LessonsBooked(clientID, id))
@@ -59,7 +55,7 @@ public class LessonService {
 
     }
 
-    public List<LessonPresentation> getAllLessons(){
+    public List<LessonPresentation> getAllLessons() {
         return lessonRepository.findAll()
                 .stream()
                 .map(LessonMapper::mapLessonToPresentation)

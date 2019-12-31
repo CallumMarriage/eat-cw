@@ -44,7 +44,7 @@
                 },
                 error: function (jqXHR, textStatus, errorMessage) {
                     clearRegDetails();
-                    registrationError.html('<p>'+jqXHR.responseXML.getElementsByTagName("errorMessage")[0].textContent+'</p>');
+                    registrationError.html('<p>'+jqXHR.responseXML.getElementsByTagName("message")[0].textContent+'</p>');
                     registrationError.css("color", "red");
                     registrationError.show();
 
@@ -66,7 +66,6 @@
             return false;
         }
     }
-
 
     function clearRegDetails() {
         $('#newUsername').val('');

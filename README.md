@@ -92,6 +92,60 @@ become tightly coupled.
 Doing this logic in the UI is also beneficial as it now means that the UI can source the Client information from anywhere and 
 the Lesson Service will still behave the same.
 
+### Decoupling the session state functionality from the controller
+
+In my design the logic to control the session is placed in a common class (This is because both services use it).
+There are two main reasons as to why I have abstracted this logic away. The first reason is to avoid duplication, some of 
+the logic is duplicated in both services across multiple methods. The second reason is to separate concerns, with my designs
+the controller does not have to worry about the session and instead just deals with standard java objects such as lessons 
+and clients.
+
+### Choice of Lot Selection structure
+
+The structure I have used for the lot selection is very simple, it is an array list stored as a session cookie.
+
+The reason I chose this is that in the brief it suggests that the selection should be session dependent.
+By storing the selection in the session, the next time a new session is created, the selection will be wiped and
+a new list will be created. 
+
+If you wanted the selection to persist between sessions it would be better to use a java structure, this
+could be a listMultiMap with the username as the key and a the lesson Ids as the values.
 
 
+### The use of side effects in the support methods
 
+In the common directory, the majority of methods use pass by reference, this means that the changes in that method
+have side effects on the rest of the code. In my opinion the use of side effects in code is a bad practise as it 
+makes the code harder to predict but in this code I have used to it make it simpler.
+
+## Completed Features 
+
+###Login
+
+> Server side check if username is in use.
+> 
+> If username does not exist link to registration appears.
+
+###Registration
+> Client side user name (Length) and password (Not null) validation.
+
+
+###Lot timetable
+> All available lots represented in a data table with choose lesson button (Each lot includes date, start time, and end time.)
+> 
+>Lot selection
+>
+>>Maximum lot selection 
+
+### Lot selected
+>
+> Selected lots represented in a data table
+>
+> Footer segment
+
+
+### Finalise selection
+
+### Navbar
+
+### Logout
