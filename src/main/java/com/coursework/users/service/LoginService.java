@@ -33,14 +33,13 @@ public class LoginService {
 
 
     public Boolean checkIfInUse(String username){
-        Optional<Client> client = loginRepository.findByUsername(username);
-        return client.isPresent();
+        return loginRepository.findByUsername(username).isPresent();
     }
 
     public Integer getClientIdByUsername(String username){
-        Optional<Client> client = loginRepository.findByUsername(username);
-
-        return client.map(Client::getClientId).orElse(null);
+        return loginRepository.findByUsername(username)
+                .map(Client::getClientId)
+                .orElse(null);
     }
 
     public Client addNewUser(Client client){

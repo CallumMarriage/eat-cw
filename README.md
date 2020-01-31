@@ -1,6 +1,6 @@
 # eat-cw
 
-## Prerequisits to running this project
+## Prerequisites to running this project
 > Java 8
 > Maven 
 
@@ -21,10 +21,35 @@ To run via maven please use the following commands in the root directy:
 To run via the IDE add a new configuration with the IDE referencing the Application class 
 at the following directory: src/main/java/com/coursework/Application.java
 
+## Attempted Questions
 
+### Mandatory 
+
+> a) Login
+
+> b) View a list of ALL free lessons
+
+> c) Choose a lesson
+
+> d) View their chosen lessons
+
+> e) Finalise a booking
+
+> f) Log out
+
+### Advanced 
+
+> Section 2: Restrict the number of lessons per user
+
+> Section 3: Implement user sign-up functionality
+
+> Section 4: AJAX implementation to check if selected username exists
+
+> Section 5: Client-side validation of username
+ 
 ## Design
 
-The main idea that has influenced my design is separation of concerns, I have done this by ordering my code in a layered service first approach, 
+The main concept that has influenced my design the most is separation of concerns, I have done this by ordering my code in a layered service first approach, 
 with all the code relevant to a specific purpose (User or Lesson) in their own directories and all of the code within that directory layered. 
 
 Each Service is essentially a microservice with a model, view(UI view) controller, service and repository.
@@ -91,7 +116,3 @@ become tightly coupled.
 
 Doing this logic in the UI is also beneficial as it now means that the UI can source the Client information from anywhere and 
 the Lesson Service will still behave the same.
-
-
-
-

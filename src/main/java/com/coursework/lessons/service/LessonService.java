@@ -34,6 +34,12 @@ public class LessonService {
     }
 
 
+    /**
+     * Finds lessons by their ids.
+     *
+     * @param lessonIds ids of lessons to be returned
+     * @return list of lessons
+     */
     public List<LessonPresentation> getAllLessonsByMultipleIds(Collection<String> lessonIds){
         Iterable<Lesson> lessonIterable = lessonRepository.findAllById(lessonIds);
 
@@ -51,6 +57,13 @@ public class LessonService {
     }
 
 
+    /**
+     * Creates a new row in the lesson booked table for each new lesson the user is apply to
+     *
+     * @param clientID id of the current client
+     * @param lessons list of lessons they want to be booked onto.
+     * @throws LessonBookedException
+     */
     public void finaliseBookingForClient(Integer clientID, Collection<String> lessons) throws LessonBookedException{
 
         lessons.stream()
@@ -59,6 +72,11 @@ public class LessonService {
 
     }
 
+    /**
+     * Gets all available lessons from database and maps to presentation model.
+     *
+     * @return List of Lessons
+     */
     public List<LessonPresentation> getAllLessons(){
         return lessonRepository.findAll()
                 .stream()
