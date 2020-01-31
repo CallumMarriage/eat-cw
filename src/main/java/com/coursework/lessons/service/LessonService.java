@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -33,26 +34,20 @@ public class LessonService {
         this.lessonsBookedRepository = lessonsBookedRepository;
     }
 
-
     /**
      * Finds lessons by their ids.
      *
      * @param lessonIds ids of lessons to be returned
      * @return list of lessons
      */
-    public List<LessonPresentation> getAllLessonsByMultipleIds(Collection<String> lessonIds){
-        Iterable<Lesson> lessonIterable = lessonRepository.findAllById(lessonIds);
-
-        List<Lesson> lessons = new ArrayList<>();
-        lessonIterable.forEach(lessons::add);
-
-        return lessons.stream()
+    public List<LessonPresentation> getAllLessonsByMultipleIds(List<String> lessonIds) {
+        return StreamSupport.stream(lessonRepository.findAllById(lessonIds).spliterator(), false)
                 .map(LessonMapper::mapLessonToPresentation)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void removeCurrentLessonsForClient(Integer clientID){
+    public void removeCurrentLessonsForClient(Integer clientID) {
         lessonsBookedRepository.deleteAllByClientId(clientID);
     }
 
@@ -64,8 +59,7 @@ public class LessonService {
      * @param lessons list of lessons they want to be booked onto.
      * @throws LessonBookedException
      */
-    public void finaliseBookingForClient(Integer clientID, Collection<String> lessons) throws LessonBookedException{
-
+    public void finaliseBookingForClient(Integer clientID, List<String> lessons) throws LessonBookedException{
         lessons.stream()
                 .map(id -> new LessonsBooked(clientID, id))
                 .forEach(lessonsBookedRepository::save);

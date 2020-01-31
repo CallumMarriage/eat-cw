@@ -1,9 +1,10 @@
 package com.coursework.lessons;
 
+import com.coursework.common.ResponseBuilder;
+import com.coursework.common.SessionHandler;
 import com.coursework.lessons.exception.LessonBookedException;
 import com.coursework.lessons.service.LessonService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,29 +14,29 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
 public class LessonController {
 
-    private LessonService lessonService;
+    private final LessonService lessonService;
 
-    @Autowired
-    public LessonController(LessonService lessonService) {
+    private final ResponseBuilder responseBuilder;
+
+    private final SessionHandler sessionHandler;
+
+    public LessonController(LessonService lessonService, ResponseBuilder responseBuilder, SessionHandler sessionHandler) {
         this.lessonService = lessonService;
+        this.responseBuilder = responseBuilder;
+        this.sessionHandler = sessionHandler;
     }
 
 
     @GetMapping("/viewTimetable")
     public String viewTimetable(ModelMap model, HttpServletRequest request) {
 
-        if (checkIfLoggedIn(request)) {
+        if (sessionHandler.checkIfLoggedIn(request)) {
             model.put("lessons", lessonService.getAllLessons());
             return "viewTimetable";
         } else {
@@ -46,16 +47,14 @@ public class LessonController {
     @GetMapping("/viewSelection")
     public String viewSelection(ModelMap model, HttpServletRequest request) {
 
-        if (checkIfLoggedIn(request)) {
+        if (sessionHandler.checkIfLoggedIn(request)) {
 
-            if(request.getSession().getAttribute("lessonChoices") == null){
+
+            if(!sessionHandler.checkIfChoicesPresent(request)){
                 return "redirect:/viewTimetable";
             }
 
-            Collection<String> lessonIds = (Collection<String>) request.getSession().getAttribute("lessonChoices");
-
-
-            model.put("myLessons", lessonService.getAllLessonsByMultipleIds(lessonIds));
+            model.put("myLessons", lessonService.getAllLessonsByMultipleIds(sessionHandler.getChoices(request)));
 
             return "viewSelection";
         } else {
@@ -65,26 +64,24 @@ public class LessonController {
 
 
     @PostMapping("/chooseLesson")
-    public String chooseLesson(HttpServletRequest request, HttpServletResponse response) throws LessonBookedException{
-        if (checkIfLoggedIn(request)) {
+    public String chooseLesson(HttpServletRequest request, HttpServletResponse response) {
+        if (sessionHandler.checkIfLoggedIn(request)) {
 
-            String lessonId = request.getParameter("lessonId");
+            String lessonId = sessionHandler.getLessonIdFromSession(request);
 
-            if(request.getSession().getAttribute("lessonChoices") == null){
-                request.getSession().setAttribute("lessonChoices", new ArrayList<>());
+            if (!sessionHandler.checkIfChoicesPresent(request)) {
+                sessionHandler.createLessonChoicesAttributeInSession(request);
             }
 
-            List<String> lessonChoices = (List<String>) request.getSession().getAttribute("lessonChoices");
+            ArrayList<String> lessonsChoices = sessionHandler.getChoices(request);
 
-            if(lessonChoices.contains(lessonId)){
+            if (lessonsChoices.contains(lessonId)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                writeMessageToResponse(response, "<error>\n" +
-                        "<message>You have already booked this lesson</message>\n" +
-                        "</error>");
+                responseBuilder.writeErrorMessageToResponse(response, "You have already booked this lesson", 6);
             }
 
-            lessonChoices.add(lessonId);
-            request.getSession().setAttribute("lessonChoices", lessonChoices);
+            lessonsChoices.add(lessonId);
+            request.getSession().setAttribute("lessonChoices", lessonsChoices);
 
             return "redirect:/viewSelection";
 
@@ -95,22 +92,30 @@ public class LessonController {
 
 
     @PostMapping("/finaliseBooking")
-    public String finaliseBooking(HttpServletRequest request, HttpServletResponse response) throws LessonBookedException{
+    public String finaliseBooking(HttpServletRequest request, HttpServletResponse response) throws LessonBookedException {
 
 
-        if (checkIfLoggedIn(request)) {
+        if (sessionHandler.checkIfLoggedIn(request)) {
 
-            Integer clientId = Integer.parseInt(request.getParameter("clientId"));
+            Integer clientId = sessionHandler.getClientIdFromSession(request);
 
             try {
                 lessonService.removeCurrentLessonsForClient(clientId);
 
-                if(request.getSession().getAttribute("lessonChoices") == null){
+                if (!sessionHandler.checkIfChoicesPresent(request)) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    return "redirect:viewSelection";
+                    return "redirect:/viewSelection";
                 }
-                lessonService.finaliseBookingForClient(clientId, (Collection<String>) request.getSession().getAttribute("lessonChoices"));
-                request.getSession().removeAttribute("lessonChoices");
+
+                ArrayList<String> lessonChoices = sessionHandler.getChoices(request);
+
+                if(lessonChoices.size() == 0){
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return "viewSelection";
+                }
+
+                lessonService.finaliseBookingForClient(clientId, lessonChoices);
+                sessionHandler.removeLessonsAttributeFromSession(request);
 
                 response.setStatus(HttpServletResponse.SC_OK);
                 return "redirect:/viewTimetable";
@@ -124,37 +129,20 @@ public class LessonController {
 
     }
 
-    @PostMapping("/removeLessonChoice/{lessonId}")
-    public String removeLessonChoice(@PathVariable("lessonId") String lessonId, HttpServletRequest request, HttpServletResponse response){
-        if(checkIfLoggedIn(request)){
+    @DeleteMapping("/removeLessonChoice/{lessonId}")
+    public String removeLessonChoice(@PathVariable("lessonId") String lessonId, HttpServletRequest request) {
+        if (sessionHandler.checkIfLoggedIn(request)) {
 
-            if(request.getSession().getAttribute("lessonChoices") == null){
+            if (!sessionHandler.checkIfChoicesPresent(request)) {
                 return "redirect:viewTimetable";
             }
+            sessionHandler.removeLessonFromSession(request, lessonId);
 
-            List<String> choices = (ArrayList<String>) request.getSession().getAttribute("lessonChoices");
-
-            List<String> filtered = choices.stream().filter(choice -> !choice.equals(lessonId)).collect(Collectors.toList());
-
-            request.getSession().setAttribute("lessonChoices", filtered);
             return "redirect:/viewTimetable";
         } else {
             return "redirect:/";
         }
     }
 
-    private Boolean checkIfLoggedIn(HttpServletRequest request) {
-        return "true".equals(request.getSession().getAttribute("isLoggedIn"));
-    }
 
-    private void writeMessageToResponse(HttpServletResponse response, String message) {
-        response.setContentType("application/xml");
-        try {
-            PrintWriter writer = response.getWriter();
-            writer.println("<?xml version='1.0' encoding='UTF-8'?> \n" + message);
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
