@@ -34,7 +34,12 @@ public class LessonService {
         this.lessonsBookedRepository = lessonsBookedRepository;
     }
 
-
+    /**
+     * Finds lessons by their ids.
+     *
+     * @param lessonIds ids of lessons to be returned
+     * @return list of lessons
+     */
     public List<LessonPresentation> getAllLessonsByMultipleIds(List<String> lessonIds) {
         return StreamSupport.stream(lessonRepository.findAllById(lessonIds).spliterator(), false)
                 .map(LessonMapper::mapLessonToPresentation)
@@ -47,15 +52,26 @@ public class LessonService {
     }
 
 
-    public void finaliseBookingForClient(Integer clientID, List<String> lessons) throws LessonBookedException {
-
+    /**
+     * Creates a new row in the lesson booked table for each new lesson the user is apply to
+     *
+     * @param clientID id of the current client
+     * @param lessons list of lessons they want to be booked onto.
+     * @throws LessonBookedException
+     */
+    public void finaliseBookingForClient(Integer clientID, List<String> lessons) throws LessonBookedException{
         lessons.stream()
                 .map(id -> new LessonsBooked(clientID, id))
                 .forEach(lessonsBookedRepository::save);
 
     }
 
-    public List<LessonPresentation> getAllLessons() {
+    /**
+     * Gets all available lessons from database and maps to presentation model.
+     *
+     * @return List of Lessons
+     */
+    public List<LessonPresentation> getAllLessons(){
         return lessonRepository.findAll()
                 .stream()
                 .map(LessonMapper::mapLessonToPresentation)

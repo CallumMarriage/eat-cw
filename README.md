@@ -1,6 +1,6 @@
 # eat-cw
 
-## Prerequisits to running this project
+## Prerequisites to running this project
 > Java 8
 > Maven 
 
@@ -21,10 +21,35 @@ To run via maven please use the following commands in the root directy:
 To run via the IDE add a new configuration with the IDE referencing the Application class 
 at the following directory: src/main/java/com/coursework/Application.java
 
+## Attempted Questions
 
+### Mandatory 
+
+> a) Login
+
+> b) View a list of ALL free lessons
+
+> c) Choose a lesson
+
+> d) View their chosen lessons
+
+> e) Finalise a booking
+
+> f) Log out
+
+### Advanced 
+
+> Section 2: Restrict the number of lessons per user
+
+> Section 3: Implement user sign-up functionality
+
+> Section 4: AJAX implementation to check if selected username exists
+
+> Section 5: Client-side validation of username
+ 
 ## Design
 
-The main idea that has influenced my design is separation of concerns, I have done this by ordering my code in a layered service first approach, 
+The main concept that has influenced my design the most is separation of concerns, I have done this by ordering my code in a layered service first approach, 
 with all the code relevant to a specific purpose (User or Lesson) in their own directories and all of the code within that directory layered. 
 
 Each Service is essentially a microservice with a model, view(UI view) controller, service and repository.
@@ -118,34 +143,3 @@ In the common directory, the majority of methods use pass by reference, this mea
 have side effects on the rest of the code. In my opinion the use of side effects in code is a bad practise as it 
 makes the code harder to predict but in this code I have used to it make it simpler.
 
-## Completed Features 
-
-###Login
-
-> Server side check if username is in use.
-> 
-> If username does not exist link to registration appears.
-
-###Registration
-> Client side user name (Length) and password (Not null) validation.
-
-
-###Lot timetable
-> All available lots represented in a data table with choose lesson button (Each lot includes date, start time, and end time.)
-> 
->Lot selection
->
->>Maximum lot selection 
-
-### Lot selected
->
-> Selected lots represented in a data table
->
-> Footer segment
-
-
-### Finalise selection
-
-### Navbar
-
-### Logout

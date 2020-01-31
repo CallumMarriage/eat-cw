@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.Element;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -23,9 +24,11 @@ public class ResponseBuilder {
     }
 
     public void writeErrorMessageToResponse(HttpServletResponse response, String message, Integer code) {
-        writeMessageToResponse(response, "<error>\n" +
-                "<message>" + message + "</message>\n" +
-                "<code>" + code + "</code>\n"+
-                "</error>");
+
+        writeMessageToResponse(response,
+                "<error>\n" +
+                        "<message>" + message + "</message>\n" +
+                        "<code>" + code + "</code>\n" +
+                        "</error>");
     }
 }
